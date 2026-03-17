@@ -1417,58 +1417,189 @@ footer {
 }
 
 /* ============================================================
-   GALLERY — TikTok & Instagram Embeds
+   GALLERY — Video Grid
    ============================================================ */
 .gallery-section {
   background: var(--cream);
   padding: 6rem 0;
 }
-.gallery-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  margin-bottom: 2.5rem;
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 3rem;
 }
-.gallery-tab {
-  padding: 0.7rem 1.8rem;
-  border-radius: var(--radius-xl);
-  font-family: var(--ff-sans);
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 1.5px solid var(--charcoal-3);
-  color: var(--text-muted);
-  background: transparent;
-  transition: var(--transition);
-}
-.gallery-tab:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-}
-.gallery-tab.active {
+.video-card {
+  position: relative;
+  aspect-ratio: 9/16;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
   background: var(--charcoal);
-  color: var(--gold);
-  border-color: var(--charcoal);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
 }
-.gallery-panel {
-  display: block;
+.video-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2), 0 0 0 2px var(--gold);
 }
-.gallery-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  align-items: center;
-}
-.gallery-embed-wrap {
-  display: flex;
-  justify-content: center;
+.video-card__thumb {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.4s ease;
 }
-.gallery-embed-wrap blockquote {
-  max-width: 100% !important;
+.video-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
 }
+.video-card__play {
+  width: 56px;
+  height: 56px;
+  background: rgba(197,164,78,0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(197,164,78,0.4);
+  transition: transform 0.3s var(--ease-out), background 0.3s;
+}
+.video-card:hover .video-card__play {
+  transform: scale(1.1);
+  background: var(--gold);
+}
+.video-card__play svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--black);
+  margin-left: 3px;
+}
+.video-card__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.4;
+  z-index: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.video-card__badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.video-card__badge svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+.video-card__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--charcoal-2);
+}
+.video-card__loading::after {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(197,164,78,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Active/playing state */
+.video-card.playing .video-card__thumb,
+.video-card.playing .video-card__overlay,
+.video-card.playing .video-card__caption,
+.video-card.playing .video-card__badge { opacity: 0; pointer-events: none; }
+.video-card__embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none;
+}
+.video-card.playing .video-card__embed { display: block; }
+
+/* Modal for mobile */
+.video-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.video-modal.open { display: flex; }
+.video-modal__inner {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 9/16;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--black);
+}
+.video-modal__inner iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.video-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+/* Social follow links */
 .gallery-social-links {
   display: flex;
   justify-content: center;
@@ -1508,10 +1639,105 @@ footer {
   height: 18px;
   fill: currentColor;
 }
+
+@media (max-width: 900px) {
+  .video-grid { grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 600px) {
   .gallery-section { padding: 4rem 0; }
-  .gallery-tabs { flex-direction: column; align-items: center; }
+  .video-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .video-card__play { width: 44px; height: 44px; }
+  .video-card__play svg { width: 18px; height: 18px; }
+  .video-card__caption { font-size: 0.65rem; padding: 0.6rem; }
   .gallery-social-links { flex-direction: column; align-items: center; }
+}
+
+/* ============================================================
+   MOBILE OPTIMIZATIONS
+   ============================================================ */
+@media (max-width: 480px) {
+  /* Hero */
+  #hero { min-height: 100dvh; }
+  .hero-content { padding: 0 1.25rem; }
+  .hero-logo-wrap { margin-bottom: 1.25rem; }
+  .hero-logo-wrap img { height: clamp(70px, 20vw, 100px); }
+  .hero-eyebrow { font-size: 0.6rem; letter-spacing: 0.18em; margin-bottom: 1rem; }
+  .hero-title { font-size: clamp(2.2rem, 9vw, 3rem); margin-bottom: 1rem; line-height: 1.08; }
+  .hero-tagline { font-size: 0.9rem; margin-bottom: 2rem; }
+  .hero-cta { gap: 0.75rem; }
+  .hero-cta .btn { font-size: 0.75rem; padding: 0.8rem 1.5rem; }
+  .hero-scroll-indicator { bottom: 1.5rem; }
+
+  /* About */
+  .about-grid { gap: 2rem; }
+  .about-image-frame { aspect-ratio: 4/3; }
+  .about-accent-line { display: none; }
+  .about-quote { padding: 0.75rem 1rem; margin: 1.25rem 0; }
+  .about-quote p { font-size: 0.95rem; }
+  .about-stats { gap: 1rem; flex-wrap: wrap; }
+  .stat-num { font-size: 1.6rem; }
+
+  /* Programme / Timeline */
+  .timeline-card { padding: 1.25rem 1.25rem; }
+  .timeline-card h3 { font-size: 1.05rem; }
+  .timeline-card p { font-size: 0.82rem; }
+
+  /* Pricing */
+  .pricing-card { padding: 2rem 1.5rem; }
+  .pricing-price { font-size: 2rem; }
+  .payment-plan-card { padding: 1.5rem 1.25rem; }
+
+  /* Promise */
+  .promise-quote-mark { font-size: 5rem; margin-bottom: 1rem; }
+  .promise-text { font-size: 1.15rem; }
+
+  /* Testimonials */
+  .testimonial-card { padding: 1.5rem; min-width: 0; }
+  .testimonial-text { font-size: 0.92rem; }
+
+  /* FAQ */
+  .faq-question { padding: 1.25rem 1.25rem; font-size: 0.92rem; }
+  .faq-answer-inner { padding: 0 1.25rem 1.25rem; font-size: 0.85rem; }
+
+  /* Gallery */
+  .gallery-embed-wrap { overflow: hidden; }
+  .gallery-embed-wrap blockquote { min-width: 0 !important; width: 100% !important; }
+
+  /* Enroll */
+  .enroll-wrap { padding: 2.5rem 1.5rem; border-radius: var(--radius-lg); }
+  .enroll-title { font-size: 1.75rem; }
+  .enroll-buttons { flex-direction: column; width: 100%; }
+  .enroll-buttons .btn { width: 100%; text-align: center; }
+
+  /* Footer */
+  .footer-bottom { flex-direction: column; text-align: center; }
+
+  /* General spacing */
+  .container { padding: 0 1.25rem; }
+  .section-pad { padding: clamp(3.5rem, 8vw, 5rem) 0; }
+  .text-center .t-heading-1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .eyebrow { font-size: 0.62rem; }
+}
+
+/* Mid-size mobile (481-768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero-title { font-size: clamp(2.5rem, 7vw, 3.5rem); }
+  .hero-logo-wrap img { height: clamp(80px, 14vw, 120px); }
+  .gallery-embed-wrap blockquote { min-width: 0 !important; }
+  .enroll-wrap { padding: 3rem 2rem; }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .btn, .btn-gold, .btn-ghost, .btn-outline, .btn-whatsapp {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .faq-question { min-height: 56px; }
+  .nav-links a { padding: 8px 0; }
+  .slider-btn { width: 48px; height: 48px; }
 }
 </style>
 </head>
@@ -1561,7 +1787,7 @@ footer {
       <img src="brand images/WhatsApp_Image_2026-01-29_at_00.36.14-removebg-preview.png" alt="TheHairOg Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
       <span style="display:none; font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:700; color:#C5A44E; letter-spacing:0.04em; text-shadow: 0 0 40px rgba(197,164,78,0.5);">TheHairOg</span>
     </div>
-    <p class="hero-eyebrow">Ibadan, Nigeria &mdash; 3-Week In-Person Masterclass</p>
+    <p class="hero-eyebrow">3-Week In-Person Masterclass</p>
     <h1 class="hero-title">From <em>Beginner</em> to Boss<br>Wig Maker in 3 Weeks.</h1>
     <p class="hero-tagline">Nigeria's premium wig-making academy. Master the craft hands-on.</p>
     <div class="hero-cta">
@@ -1917,28 +2143,9 @@ footer {
       <p style="color:var(--text-muted); margin-top:1rem; font-size:1rem; max-width:520px; margin-left:auto; margin-right:auto;">Watch tutorials, transformations, and student progress across our social channels.</p>
     </div>
 
-    <div class="gallery-stack reveal">
-      <!-- TikTok Embed -->
-      <div class="gallery-panel" id="panel-tiktok">
-        <div class="gallery-embed-wrap">
-          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@thehairog" data-unique-id="thehairog" data-embed-from="embed_page" data-embed-type="creator" style="max-width:780px; min-width:288px;">
-            <section>
-              <a target="_blank" href="https://www.tiktok.com/@thehairog?refer=creator_embed">@thehairog</a>
-            </section>
-          </blockquote>
-        </div>
-      </div>
-
-      <!-- Instagram Embed -->
-      <div class="gallery-panel" id="panel-instagram">
-        <div class="gallery-embed-wrap">
-          <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/thehairog/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px; max-width:540px; min-width:326px; padding:0; width:calc(100% - 2px);">
-            <a href="https://www.instagram.com/thehairog/" target="_blank" style="display:block; padding:16px; text-align:center; font-family:var(--ff-sans); color:var(--text-muted);">
-              View TheHairOg on Instagram
-            </a>
-          </blockquote>
-        </div>
-      </div>
+    <!-- Video Thumbnail Grid — auto-populated via oEmbed -->
+    <div class="video-grid reveal" id="videoGrid">
+      <!-- Cards injected by JS -->
     </div>
 
     <!-- Follow Links -->
@@ -1951,6 +2158,12 @@ footer {
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         Follow on Instagram
       </a>
+    </div>
+
+    <!-- Video Modal (for click-to-play) -->
+    <div class="video-modal" id="videoModal">
+      <button class="video-modal__close" id="videoModalClose">&times;</button>
+      <div class="video-modal__inner" id="videoModalInner"></div>
     </div>
   </div>
 </section>
@@ -2050,6 +2263,7 @@ footer {
       <p class="spots-label">2 spots filled &middot; 3 remaining</p>
       <h2 class="enroll-title">Limited to <em>5 students.</em><br>One spot could be yours.</h2>
       <p class="enroll-sub">Fill the form below to register your interest. We'll reach out with full cohort details and payment instructions.</p>
+      <p style="display:inline-flex; align-items:center; gap:0.5rem; color:var(--gold); font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:1.5rem;"><span style="font-size:1rem;">&#9906;</span> Ibadan, Nigeria &mdash; In-Person Classes</p>
 
       <div id="enrollFormWrap">
         <form id="enrollForm" class="enroll-form" novalidate>
@@ -2471,19 +2685,155 @@ footer {
     });
   }
 
-  /* ---- Load Instagram Embed ---- */
-  (function() {
-    const s = document.createElement('script');
-    s.src = 'https://www.instagram.com/embed.js';
-    s.async = true;
-    s.onload = () => { if (window.instgrm) window.instgrm.Embeds.process(); };
-    document.body.appendChild(s);
-  })();
+})();
 
+/* ==============================================================
+   VIDEO GALLERY — oEmbed powered
+   ==============================================================
+   HOW TO ADD VIDEOS:
+   Just paste TikTok or Instagram Reel URLs into the array below.
+   The script auto-fetches thumbnails via oEmbed API.
+   ============================================================== */
+(function() {
+  const VIDEOS = [
+    // ── PASTE YOUR VIDEO URLS BELOW ──
+    // TikTok format:  'https://www.tiktok.com/@thehairog/video/XXXXXXXXXXXX'
+    // Instagram Reel: 'https://www.instagram.com/reel/XXXXXXXXXXXX/'
+    //
+    // Example (replace with your real video URLs):
+    // 'https://www.tiktok.com/@thehairog/video/7345678901234567890',
+    // 'https://www.instagram.com/reel/C1234567890/',
+  ];
+
+  const grid = document.getElementById('videoGrid');
+  const modal = document.getElementById('videoModal');
+  const modalInner = document.getElementById('videoModalInner');
+  const modalClose = document.getElementById('videoModalClose');
+
+  if (!grid || VIDEOS.length === 0) {
+    // If no videos configured, show a placeholder message
+    if (grid && VIDEOS.length === 0) {
+      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem 0; font-size:0.95rem;">Videos coming soon — follow us on TikTok and Instagram for the latest content.</p>';
+    }
+    return;
+  }
+
+  const playSVG = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>';
+  const tiktokBadge = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.73a8.19 8.19 0 004.76 1.52V6.8a4.84 4.84 0 01-1-.11z"/></svg>';
+  const instaBadge = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>';
+
+  // Detect platform from URL
+  function getPlatform(url) {
+    if (url.includes('tiktok.com')) return 'tiktok';
+    if (url.includes('instagram.com')) return 'instagram';
+    return 'unknown';
+  }
+
+  // Extract TikTok video ID
+  function getTikTokId(url) {
+    const match = url.match(/video\/(\d+)/);
+    return match ? match[1] : null;
+  }
+
+  // Build a loading card placeholder
+  function createCard(url, index) {
+    const platform = getPlatform(url);
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.dataset.url = url;
+    card.dataset.platform = platform;
+    card.dataset.index = index;
+    card.innerHTML =
+      '<div class="video-card__loading"></div>' +
+      '<img class="video-card__thumb" alt="" loading="lazy">' +
+      '<div class="video-card__overlay"><div class="video-card__play">' + playSVG + '</div></div>' +
+      '<div class="video-card__badge">' + (platform === 'tiktok' ? tiktokBadge + ' TikTok' : instaBadge + ' Reel') + '</div>' +
+      '<div class="video-card__caption"></div>';
+    return card;
+  }
+
+  // Fetch thumbnail via oEmbed
+  async function fetchOembed(url, card) {
+    const platform = getPlatform(url);
+    let apiUrl;
+
+    if (platform === 'tiktok') {
+      apiUrl = 'https://www.tiktok.com/oembed?url=' + encodeURIComponent(url);
+    } else if (platform === 'instagram') {
+      apiUrl = 'https://graph.facebook.com/v18.0/instagram_oembed?url=' + encodeURIComponent(url) + '&access_token=IGQWRP&omitscript=true';
+    }
+
+    try {
+      const resp = await fetch(apiUrl);
+      if (!resp.ok) throw new Error('oEmbed failed');
+      const data = await resp.json();
+
+      const thumb = card.querySelector('.video-card__thumb');
+      const caption = card.querySelector('.video-card__caption');
+      const loading = card.querySelector('.video-card__loading');
+
+      if (data.thumbnail_url) {
+        thumb.src = data.thumbnail_url;
+        thumb.onload = () => { if (loading) loading.remove(); };
+      } else {
+        if (loading) loading.remove();
+      }
+      if (data.title) caption.textContent = data.title;
+    } catch (err) {
+      // Fallback: remove loading spinner, show generic thumbnail
+      const loading = card.querySelector('.video-card__loading');
+      if (loading) {
+        loading.innerHTML = '<span style="color:var(--gold);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;">Preview</span>';
+      }
+    }
+  }
+
+  // Get embed URL for iframe playback
+  function getEmbedUrl(url) {
+    const platform = getPlatform(url);
+    if (platform === 'tiktok') {
+      const id = getTikTokId(url);
+      return id ? 'https://www.tiktok.com/embed/v2/' + id + '?autoplay=1' : url;
+    }
+    if (platform === 'instagram') {
+      return url + (url.endsWith('/') ? '' : '/') + 'embed/?autoplay=1';
+    }
+    return url;
+  }
+
+  // Open modal with video
+  function openModal(url) {
+    const embedUrl = getEmbedUrl(url);
+    modalInner.innerHTML = '<iframe src="' + embedUrl + '" allowfullscreen allow="autoplay; encrypted-media"></iframe>';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modalInner.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Build the grid
+  VIDEOS.forEach(function(url, i) {
+    const card = createCard(url, i);
+    grid.appendChild(card);
+    fetchOembed(url, card);
+
+    card.addEventListener('click', function() {
+      openModal(url);
+    });
+  });
 })();
 </script>
-
-<!-- TikTok Embed SDK -->
-<script src="https://www.tiktok.com/embed.js" async></script>
 </body>
 </html>
