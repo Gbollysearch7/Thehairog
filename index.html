@@ -383,7 +383,7 @@ ul { list-style: none; }
   justify-content: center;
 }
 .hero-logo-wrap img {
-  height: clamp(64px, 10vw, 100px);
+  height: clamp(90px, 15vw, 150px);
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 24px rgba(197,164,78,0.4));
@@ -1453,10 +1453,13 @@ footer {
   border-color: var(--charcoal);
 }
 .gallery-panel {
-  display: none;
-}
-.gallery-panel.active {
   display: block;
+}
+.gallery-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  align-items: center;
 }
 .gallery-embed-wrap {
   display: flex;
@@ -1560,8 +1563,8 @@ footer {
       <span style="display:none; font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:700; color:#C5A44E; letter-spacing:0.04em; text-shadow: 0 0 40px rgba(197,164,78,0.5);">TheHairOg</span>
     </div>
     <p class="hero-eyebrow">Ibadan, Nigeria &mdash; 3-Week In-Person Masterclass</p>
-    <h1 class="hero-title">From <em>beginner</em> to<br>boss wig maker.</h1>
-    <p class="hero-tagline">From Beginner to Boss Wig Maker in 3 Weeks.</p>
+    <h1 class="hero-title">From <em>Beginner</em> to Boss<br>Wig Maker in 3 Weeks.</h1>
+    <p class="hero-tagline">Nigeria's premium wig-making academy. Master the craft hands-on.</p>
     <div class="hero-cta">
       <a href="#enroll" class="btn btn-gold">Enroll Now &rarr;</a>
       <a href="#programme" class="btn btn-ghost">See Curriculum</a>
@@ -1915,30 +1918,27 @@ footer {
       <p style="color:var(--text-muted); margin-top:1rem; font-size:1rem; max-width:520px; margin-left:auto; margin-right:auto;">Watch tutorials, transformations, and student progress across our social channels.</p>
     </div>
 
-    <div class="gallery-tabs reveal">
-      <button class="gallery-tab active" data-panel="tiktok">TikTok</button>
-      <button class="gallery-tab" data-panel="instagram">Instagram</button>
-    </div>
-
-    <!-- TikTok Panel -->
-    <div class="gallery-panel active" id="panel-tiktok">
-      <div class="gallery-embed-wrap">
-        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@thehairog" data-unique-id="thehairog" data-embed-from="embed_page" data-embed-type="creator" style="max-width:780px; min-width:288px;">
-          <section>
-            <a target="_blank" href="https://www.tiktok.com/@thehairog?refer=creator_embed">@thehairog</a>
-          </section>
-        </blockquote>
+    <div class="gallery-stack reveal">
+      <!-- TikTok Embed -->
+      <div class="gallery-panel" id="panel-tiktok">
+        <div class="gallery-embed-wrap">
+          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@thehairog" data-unique-id="thehairog" data-embed-from="embed_page" data-embed-type="creator" style="max-width:780px; min-width:288px;">
+            <section>
+              <a target="_blank" href="https://www.tiktok.com/@thehairog?refer=creator_embed">@thehairog</a>
+            </section>
+          </blockquote>
+        </div>
       </div>
-    </div>
 
-    <!-- Instagram Panel -->
-    <div class="gallery-panel" id="panel-instagram">
-      <div class="gallery-embed-wrap">
-        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/thehairog/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px; max-width:540px; min-width:326px; padding:0; width:calc(100% - 2px);">
-          <a href="https://www.instagram.com/thehairog/" target="_blank" style="display:block; padding:16px; text-align:center; font-family:var(--ff-sans); color:var(--text-muted);">
-            View TheHairOg on Instagram
-          </a>
-        </blockquote>
+      <!-- Instagram Embed -->
+      <div class="gallery-panel" id="panel-instagram">
+        <div class="gallery-embed-wrap">
+          <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/thehairog/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px; max-width:540px; min-width:326px; padding:0; width:calc(100% - 2px);">
+            <a href="https://www.instagram.com/thehairog/" target="_blank" style="display:block; padding:16px; text-align:center; font-family:var(--ff-sans); color:var(--text-muted);">
+              View TheHairOg on Instagram
+            </a>
+          </blockquote>
+        </div>
       </div>
     </div>
 
@@ -2472,27 +2472,14 @@ footer {
     });
   }
 
-  /* ---- Gallery Tab Switching ---- */
-  const galleryTabs = document.querySelectorAll('.gallery-tab');
-  const galleryPanels = document.querySelectorAll('.gallery-panel');
-  galleryTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      galleryTabs.forEach(t => t.classList.remove('active'));
-      galleryPanels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
-
-      // Load Instagram embed script on first switch
-      if (tab.dataset.panel === 'instagram' && !window.__igLoaded) {
-        window.__igLoaded = true;
-        const s = document.createElement('script');
-        s.src = 'https://www.instagram.com/embed.js';
-        s.async = true;
-        s.onload = () => { if (window.instgrm) window.instgrm.Embeds.process(); };
-        document.body.appendChild(s);
-      }
-    });
-  });
+  /* ---- Load Instagram Embed ---- */
+  (function() {
+    const s = document.createElement('script');
+    s.src = 'https://www.instagram.com/embed.js';
+    s.async = true;
+    s.onload = () => { if (window.instgrm) window.instgrm.Embeds.process(); };
+    document.body.appendChild(s);
+  })();
 
 })();
 </script>
