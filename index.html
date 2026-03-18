@@ -2610,7 +2610,7 @@ footer {
   const enrollSuccess = document.getElementById('enrollSuccess');
 
   if (enrollForm) {
-    enrollForm.addEventListener('submit', function(e) {
+    enrollForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const data = {
@@ -2626,6 +2626,29 @@ footer {
       // Validate
       if (!data.firstName || !data.lastName || !data.email || !data.phone || !data.tier || !data.experience) {
         return;
+      }
+
+      // Disable submit button while sending
+      const submitBtn = enrollForm.querySelector('button[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+
+      // Send to Formspree → thehairogg@gmail.com
+      try {
+        const res = await fetch('https://formspree.io/f/xdoqgpbz', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `${data.firstName} ${data.lastName}`,
+            email: data.email,
+            phone: data.phone,
+            tier: data.tier,
+            experience: data.experience,
+            _subject: `New Registration: ${data.firstName} ${data.lastName} — TheHairOg Academy`,
+          }),
+        });
+        if (!res.ok) throw new Error('network');
+      } catch (_) {
+        // Silent fail — still show success and WhatsApp so user isn't blocked
       }
 
       // Store locally as backup
