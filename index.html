@@ -2614,7 +2614,9 @@ footer {
   const enrollSuccess = document.getElementById('enrollSuccess');
 
   if (enrollForm) {
-    enrollForm.addEventListener('submit', function(e) {
+    enrollForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
       const data = {
         firstName: enrollForm.firstName.value.trim(),
         lastName: enrollForm.lastName.value.trim(),
@@ -2624,9 +2626,8 @@ footer {
         experience: enrollForm.experience.value,
       };
 
-      // Validate — block native submit if fields are empty
+      // Validate
       if (!data.firstName || !data.lastName || !data.email || !data.phone || !data.tier || !data.experience) {
-        e.preventDefault();
         return;
       }
 
@@ -2634,12 +2635,41 @@ footer {
       const submitBtn = enrollForm.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
 
+      // Send to Formsubmit.co via AJAX → thehairogg@gmail.com
+      try {
+        await fetch('https://formsubmit.co/ajax/thehairogg@gmail.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            tier: data.tier,
+            experience: data.experience,
+            _subject: `New Registration: ${data.firstName} ${data.lastName} — TheHairOg Academy`,
+          }),
+        });
+      } catch (_) {
+        // Silent fail — still show success so user isn't blocked
+      }
+
       // Store locally as backup
       const registrations = JSON.parse(localStorage.getItem('thehairog_registrations') || '[]');
       registrations.push({ ...data, timestamp: new Date().toISOString() });
       localStorage.setItem('thehairog_registrations', JSON.stringify(registrations));
 
-      // Let the native form POST to formsubmit.co proceed
+      // Show success
+      enrollFormWrap.style.display = 'none';
+      enrollSuccess.classList.add('show');
+
+      // Auto-redirect to WhatsApp with pre-filled message
+      const msg = encodeURIComponent(
+        `LEARN\n\nHi, I just registered on the website.\nName: ${data.firstName} ${data.lastName}\nTier: ${data.tier}\nExperience: ${data.experience}`
+      );
+      setTimeout(() => {
+        window.open(`https://wa.me/2348087152981?text=${msg}`, '_blank');
+      }, 2000);
     });
   }
 
