@@ -2236,7 +2236,11 @@ footer {
       <p style="display:inline-flex; align-items:center; gap:0.5rem; color:var(--gold); font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:1.5rem;"><span style="font-size:1rem;">&#9906;</span> Ibadan, Nigeria &mdash; In-Person Classes</p>
 
       <div id="enrollFormWrap">
-        <form id="enrollForm" class="enroll-form" novalidate>
+        <form id="enrollForm" class="enroll-form" action="https://formsubmit.co/thehairogg@gmail.com" method="POST" novalidate>
+          <input type="hidden" name="_subject" value="New Registration — TheHairOg Academy">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://thehairog.com/#enroll">
+          <input type="text" name="_honey" style="display:none">
           <div class="form-row-2col">
             <div class="form-row">
               <label for="firstName">First Name</label>
@@ -2610,9 +2614,7 @@ footer {
   const enrollSuccess = document.getElementById('enrollSuccess');
 
   if (enrollForm) {
-    enrollForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-
+    enrollForm.addEventListener('submit', function(e) {
       const data = {
         firstName: enrollForm.firstName.value.trim(),
         lastName: enrollForm.lastName.value.trim(),
@@ -2620,53 +2622,24 @@ footer {
         phone: enrollForm.phone.value.trim(),
         tier: enrollForm.tier.value,
         experience: enrollForm.experience.value,
-        timestamp: new Date().toISOString(),
       };
 
-      // Validate
+      // Validate — block native submit if fields are empty
       if (!data.firstName || !data.lastName || !data.email || !data.phone || !data.tier || !data.experience) {
+        e.preventDefault();
         return;
       }
 
-      // Disable submit button while sending
+      // Disable submit button
       const submitBtn = enrollForm.querySelector('button[type="submit"]');
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
 
-      // Send to Formspree → thehairogg@gmail.com
-      try {
-        const res = await fetch('https://formspree.io/f/xdoqgpbz', {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: `${data.firstName} ${data.lastName}`,
-            email: data.email,
-            phone: data.phone,
-            tier: data.tier,
-            experience: data.experience,
-            _subject: `New Registration: ${data.firstName} ${data.lastName} — TheHairOg Academy`,
-          }),
-        });
-        if (!res.ok) throw new Error('network');
-      } catch (_) {
-        // Silent fail — still show success and WhatsApp so user isn't blocked
-      }
-
       // Store locally as backup
       const registrations = JSON.parse(localStorage.getItem('thehairog_registrations') || '[]');
-      registrations.push(data);
+      registrations.push({ ...data, timestamp: new Date().toISOString() });
       localStorage.setItem('thehairog_registrations', JSON.stringify(registrations));
 
-      // Show success
-      enrollFormWrap.style.display = 'none';
-      enrollSuccess.classList.add('show');
-
-      // Auto-redirect to WhatsApp with pre-filled message
-      const msg = encodeURIComponent(
-        `LEARN\n\nHi, I just registered on the website.\nName: ${data.firstName} ${data.lastName}\nTier: ${data.tier}\nExperience: ${data.experience}`
-      );
-      setTimeout(() => {
-        window.open(`https://wa.me/2348087152981?text=${msg}`, '_blank');
-      }, 2000);
+      // Let the native form POST to formsubmit.co proceed
     });
   }
 
